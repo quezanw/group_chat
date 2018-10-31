@@ -9,6 +9,9 @@ const io = require('socket.io')(server);
 io.on('connection', function(socket) {
     socket.emit('connected', { msg: 'You have been connected to the server' })
 
+    socket.on("user_connected", function (data) {
+        console.log(data.msg);
+    })
 
 });
 

@@ -13,8 +13,19 @@
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
 
     <script>
+        $(document).ready(function () {
 
+            var socket = io();
 
+            socket.on('connected', function (data) { //4
+                console.log(data.msg); //5
+                socket.emit('user_connected', {
+                    msg: 'Thank you for connecting me! -Client'
+                }); //6
+            });
+
+            
+        })
     </script>
 </head>
 
