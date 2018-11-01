@@ -2,49 +2,103 @@
 <html>
 
 <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Group Chat</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
-        crossorigin="anonymous">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/main.css" />
-    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Group Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+    crossorigin="anonymous">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/main.css" />
+  <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+  <script src=""></script>
+  <script>
+    $(document).ready(function () {
+      
+      var socket = io();
 
-    <script>
-        $(document).ready(function () {
+      socket.on('connected', function (data) { //4
+        console.log(data.msg); //5
+        socket.emit('user_connected', {
+            msg: 'Thank you for connecting me! -Client'
+        });
+      });
 
-            var socket = io();
+      let name = prompt("Enter a your name");
+      if(name) {
+        socket.emit("new_user_connected", {new_user_name: name})
+      }
 
-            socket.on('connected', function (data) { //4
-                console.log(data.msg); //5
-                socket.emit('user_connected', {
-                    msg: 'Thank you for connecting me! -Client'
-                }); //6
-            });
-        })
-    </script>
+      socket.on("new_user", function(data) {
+        console.log("new_user broadcast")
+        let new_user = document.createElement("p");
+        new_user.classList += "user-name";
+        new_user.innerHTML = data.name;
+        $(".users").append(new_user);
+        $(".chat-box").append("<p class='chat-msg'>"+ data.name +" has connected!</p>")
+      });
+
+      socket.on("display_all", function(data) {
+        for(let user_id in data.users) {
+          let user = document.createElement("p");
+          user.classList += "user-name";
+          user.innerHTML = data.users[user_id];
+          $(".users").append(user);
+        }
+      });
+
+      $("button.btn").click(function(e) {
+        e.preventDefault();
+        let msg = $("input.form-control").val();
+        if(msg.length > 0) {
+          $("input.form-control").val("");
+          socket.emit("message_posted", {msg:msg});
+        }
+      })
+
+      socket.on("post_new_message", function(data) {
+        let msg = document.createElement("p");
+        msg.classList += "message";
+        msg.innerHTML += data.user_name + ": " + data.msg;
+        $(".chat-box").append(msg);
+      });
+
+      socket.on("user_disconnected", function(data) {
+        console.log("disconnected" + JSON.stringify(data));
+        console.log(data.name + " disconnected");
+        let user = document.createElement("p");
+        user.classList += "user-name";
+        user.innerHTML = data.name;
+        $(".users").text("");
+        $(".chat-box").append("<p class='chat-msg'>"+ data.name +" has disconnected.</p>")
+        for(let user_id in data.users) {
+          let user = document.createElement("p");
+          user.classList += "user-name";
+          user.innerHTML = data.users[user_id];
+          $(".users").append(user);
+        }
+      });
+
+
+    })
+  </script>
 </head>
 
 <body>
-    <div class="row container-fluid">
-        <div class="col-lg-3 col connected-users">
-            <h3>Connected Users</h3>
-            <div class="users">
-                <p class="user-name">Michael Choi</p>
-                <p class="user-name">Michael Choi</p>
-                <p class="user-name">Michael Choi</p>
-                <p class="user-name">Michael Choi</p>
-            </div>
-        </div>
-        <div class="col-lg-6 col chat-wrapper">
-            <h3>Chat Room</h3>
-            <div class="chat-box"></div>
-            <input class="form-control" type="text" />
-            <button class="btn btn-primary float-right">post</button>
-        </div>
+  <div class="row container-fluid">
+    <div class="col-lg-3 col connected-users">
+      <h3>Connected Users</h3>
+      <div class="users">
+
+      </div>
     </div>
+    <div class="col-lg-6 col chat-wrapper">
+      <h3>Chat Room</h3>
+      <div class="chat-box"></div>
+      <input class="form-control" type="text" />
+      <button class="btn btn-primary float-right">post</button>
+    </div>
+  </div>
 </body>
 
 </html>
