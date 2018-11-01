@@ -1,0 +1,41 @@
+body * {
+    outline: 1px solid pink;
+    margin: 0;
+    padding: 0;
+}
+
+.col {
+    margin: 1em;
+    border: 1px solid black;
+    height: 600px;
+}
+
+h3 {
+    border: 1px solid black;
+    margin: .5em 0;
+    padding: 5px;
+    text-align: center;
+}
+
+div.users {
+    border: 1px solid black;
+    width: 100%;
+    height: 500px;
+    padding: 1em;
+}
+
+div.chat-box {
+    border: 1px solid black;
+    height: 65%;
+    width: 100%;
+    margin-bottom: 1em;
+}
+
+input {
+    margin-bottom: 1em;
+    /* border: 1px solid black; */
+}
+
+button.btn {
+    width: 20%;
+}
